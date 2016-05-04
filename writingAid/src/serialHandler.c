@@ -96,6 +96,6 @@ void USART0_Handler(void)
 		else
 		{
 			usart_disable_interrupt(USART_SERIAL, US_IER_TXRDY);
-		}
+		}//test
 	}
 }
