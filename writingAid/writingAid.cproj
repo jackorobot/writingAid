@@ -556,6 +556,12 @@
     <Compile Include="src\ASF\sam\drivers\usart\usart.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\Kinematics.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Kinematics.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\serialHandler.c">
       <SubType>compile</SubType>
     </Compile>
