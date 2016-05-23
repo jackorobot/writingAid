@@ -32,6 +32,7 @@
 #include "conf_board.h"
 #include "conf_clock.h"
 #include "serialHandler.h"
+#include "motorDriver.h"
 
 int main (void)
 {
