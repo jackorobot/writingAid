@@ -6,6 +6,7 @@
  */ 
 
 #include "motorDriver.h"
+#include <math.h>
 
 void initMotorDriver(void)
 {
@@ -65,4 +66,161 @@ void initMotorDriver(void)
 	//Write zeroes to these pins
 	PIOC->PIO_ODSR &= ~(31 << D1CUR); //Drive 1: Set the 5 bits for current set (1-5)
 	PIOC->PIO_ODSR &= ~(31 << D2CUR); //Drive 2: Set the 5 bits for current set (21-25)
+	
+	
+	//Start interrupt for driver faults
+	NVIC_EnableIRQ(PIOA_IRQn);
+	NVIC_EnableIRQ(PIOC_IRQn);
+}
+
+extern void setCurrent(uint32_t driver, uint32_t current)
+{
+	if(current <= 0x1F)
+	{
+		if(driver == 1)
+		{
+			//Clear bits from Drive 1
+			PIOC->PIO_ODSR &= ~(31 << D1CUR);
+			//Write current to Drive 1
+			PIOC->PIO_ODSR |= (current << D1CUR);
+		}else if (driver == 2)
+		{
+			//Clear bits from Drive 2
+			PIOC->PIO_ODSR &= ~(31 << D2CUR);
+			//Write current to Drive 2
+			PIOC->PIO_ODSR |= (current << D2CUR);
+		}
+	}
+}
+
+extern void enableDrive(uint32_t driver)
+{
+	if (driver == 1)
+	{
+		//Set enable bit of drive 1
+		PIOC->PIO_OER = D1ENBL;
+	}else if (driver == 2)
+	{
+		//Set enable bit of drive 2
+		PIOB->PIO_OER = D2ENBL;
+	}
+}
+
+extern void disableDrive(uint32_t driver)
+{
+	if (driver == 1)
+	{
+		//Clear enable bit of drive 1
+		PIOC->PIO_ODR = D1ENBL;
+	} 
+	else if (driver == 2)
+	{
+		//Clear enable bit of drive 2
+		PIOB->PIO_ODR = D2ENBL;
+	}
+}
+
+extern void resetSetDrive(uint32_t driver)
+{
+	if (driver == 1)
+	{
+		//Reset Nreset bit of drive 1
+		PIOC->PIO_ODR = D1NRESET;
+	}else if (driver == 2)
+	{
+		//Reset Nreset bit of drive 2
+		PIOC->PIO_ODR = D2NRESET;
+	}
+}
+
+extern void resetClearDrive(uint32_t driver)
+{
+	if (driver == 1)
+	{
+		//Set Nreset bit of Drive 1
+		PIOC->PIO_OER = D1ENBL;
+	} 
+	else if (driver == 2)
+	{
+		//Set Nreset bit of Drive 2
+		PIOC->PIO_OER = D2ENBL;
+	}
+}
+
+void PIOA_Handler(void)
+{
+	NVIC_ClearPendingIRQ(PIOA_IRQn);
+	
+	//Interrupt of Drive 2: Nfault
+	if (PIOA->PIO_ISR & D2NFAULT)
+	{
+		//Interrupt from Drive 2: Nfault pinchange pending
+		if (PIOA->PIO_PDSR & D2NFAULT)
+		{
+			//Nfault is high, then not reset the drive
+			resetClearDrive(2);
+		}else{
+			//Nfault is low, then reset the drive
+			resetSetDrive(2);
+		}
+	}
+}
+
+void PIOC_Handler(void)
+{
+	NVIC_ClearPendingIRQ(PIOC_IRQn);
+	
+	//Interrupt of Drive 1: Nfault
+	if (PIOC->PIO_ISR & D1NFAULT)
+	{
+		//Interrupt from Drive 1: Nfault pinchange pending
+		if (PIOC->PIO_PDSR & D1NFAULT)
+		{
+			//Nfault is high, then not reset the drive
+			resetClearDrive(1);
+		} 
+		else
+		{
+			//Nfault is low, then reset the drive
+			resetSetDrive(1);
+		}
+	}
+}
+
+extern void writeForcePercentage(uint32_t driver, double percentage)
+{
+	//First calculate the current and get the direction
+	bool phase = (percentage < 0.0); //If percentage is negative then phase is 1
+	
+	double absPercentage = abs(percentage); //Calculate absolute value
+	
+	double currentDouble = absPercentage / 100.0 * 31.0;
+	
+	uint32_t current = (uint32_t)currentDouble;
+	
+	setCurrent(driver, current);
+	
+	//Write phase to driver
+	if (driver == 1)
+	{
+		if (phase)
+		{
+			//Phase is 1, write to drive 1
+			PIOC->PIO_SODR = D1APHASE;
+		}else{
+			//Phase is 0, write to drive 1
+			PIOC->PIO_CODR = D1APHASE;
+		}
+	} 
+	else if (driver == 2)
+	{
+		if (phase)
+		{
+			//Phase is 1, write to drive 2
+			PIOB->PIO_SODR = D1APHASE;
+		}else{
+			//Phase is 0, write to drive 2
+			PIOB->PIO_CODR = D1APHASE;
+		}
+	}
 }

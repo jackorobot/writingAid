@@ -40,7 +40,11 @@ int main (void)
 	sysclk_init();
 	board_init();
 	
+	//Initialize the serial communication handler for USART0
 	serialInit();
+	
+	//Start the initialization of the motor driverd
+	initMotorDriver();
 	
 	//Enable all interrupts, last thing to do before starting the main loop
 	cpu_irq_enable();

@@ -33,4 +33,16 @@
 
 extern void initMotorDriver(void);
 
+extern void writeForcePercentage(uint32_t driver, double percentage);
+
+extern void setCurrent(uint32_t driver, uint32_t current);
+
+extern void enableDrive(uint32_t driver);
+
+extern void disableDrive(uint32_t driver);
+
+extern void resetSetDrive(uint32_t driver);
+
+extern void resetClearDrive(uint32_t driver);
+
 #endif /* MOTORDRIVER_H_ */
