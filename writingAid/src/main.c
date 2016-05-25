@@ -33,6 +33,11 @@
 #include "conf_clock.h"
 #include "serialHandler.h"
 #include "motorDriver.h"
+#include "encoders.h"
+
+//Global data
+encoder enc1;
+encoder enc2;
 
 int main (void)
 {
@@ -45,6 +50,21 @@ int main (void)
 	
 	//Start the initialization of the motor driverd
 	initMotorDriver();
+	
+	//Set and initialize encoder data
+	enc1.number = 1;
+	enc1.steps = 0;
+	enc1.fullRotations = 0;
+	enc1.cpr = 200;
+	
+	initEncoder(&enc1);
+	
+	enc1.number = 2;
+	enc1.steps = 0;
+	enc1.fullRotations = 0;
+	enc1.cpr = 200;
+	
+	initEncoder(&enc2);
 	
 	//Enable all interrupts, last thing to do before starting the main loop
 	cpu_irq_enable();
