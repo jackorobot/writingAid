@@ -544,6 +544,12 @@
     <Compile Include="src\encoders.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\Kinematics.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\Kinematics.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\interrupts.c">
       <SubType>compile</SubType>
     </Compile>
