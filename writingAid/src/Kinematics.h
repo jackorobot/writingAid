@@ -11,10 +11,11 @@
 #include <asf.h>
 
 typedef struct positions {
+	float diameter; //mm
+	float resolution;
+	
 	uint32_t rotaryEncoder1;
 	uint32_t rotaryEncoder2;
-	
-	
 	
 	float positionPenX;
 	float positionPenY;
@@ -37,5 +38,9 @@ typedef struct positions {
 	uint32_t motorTicks1;
 	uint32_t motorTicks2;
 	
-};
+} positions;
+extern void calculatePositonMotor(positions *arms);
+extern void calculatePositionPen(positions *arms);
+extern void calculateNewPositionPen(positions *arms);
+extern void calculateRotations(positions * arms);
 #endif /* KINEMATICS_H_ */
