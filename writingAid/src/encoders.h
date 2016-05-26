@@ -30,6 +30,10 @@ typedef struct {
 
 extern void initEncoder(encoder *enc);
 
-extern inline void readEncoder(encoder *enc);
+extern void readEncoder(encoder *enc);
+
+extern encoder enc1;
+
+extern encoder enc2;
 
 #endif /* ENCODERS_H_ */

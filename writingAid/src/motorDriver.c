@@ -147,46 +147,6 @@ extern void resetClearDrive(uint32_t driver)
 	}
 }
 
-void PIOA_Handler(void)
-{
-	NVIC_ClearPendingIRQ(PIOA_IRQn);
-	
-	//Interrupt of Drive 2: Nfault
-	if (PIOA->PIO_ISR & D2NFAULT)
-	{
-		//Interrupt from Drive 2: Nfault pinchange pending
-		if (PIOA->PIO_PDSR & D2NFAULT)
-		{
-			//Nfault is high, then not reset the drive
-			resetClearDrive(2);
-		}else{
-			//Nfault is low, then reset the drive
-			resetSetDrive(2);
-		}
-	}
-}
-
-void PIOC_Handler(void)
-{
-	NVIC_ClearPendingIRQ(PIOC_IRQn);
-	
-	//Interrupt of Drive 1: Nfault
-	if (PIOC->PIO_ISR & D1NFAULT)
-	{
-		//Interrupt from Drive 1: Nfault pinchange pending
-		if (PIOC->PIO_PDSR & D1NFAULT)
-		{
-			//Nfault is high, then not reset the drive
-			resetClearDrive(1);
-		} 
-		else
-		{
-			//Nfault is low, then reset the drive
-			resetSetDrive(1);
-		}
-	}
-}
-
 extern void writeForcePercentage(uint32_t driver, double percentage)
 {
 	//First calculate the current and get the direction

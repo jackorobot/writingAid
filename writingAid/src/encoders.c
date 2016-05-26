@@ -55,7 +55,7 @@ extern void initEncoder(encoder *enc)
 	}
 }
 
-extern void readEncoder(encoder *enc)
+extern inline void readEncoder(encoder *enc)
 {
 	if (enc->number == 1)
 	{
@@ -81,33 +81,5 @@ extern void readEncoder(encoder *enc)
 			enc->bSet = (PIOA->PIO_PDSR & ENC2B) ? 1 : 0;
 			enc->steps += (enc->aSet == enc->bSet) ? -1 : 1;
 		}
-	}
-}
-
-void PIOA_Handler(void)
-{
-	if (PIOA->PIO_ISR & ENC1I)
-	{
-		readEncoder(&enc1);
-	}
-	if (PIOA->PIO_ISR & ENC2A)
-	{
-		readEncoder(&enc2);
-	}
-}
-
-void PIOB_Handler(void)
-{
-	if(PIOB->PIO_ISR & (ENC1A | ENC1B))
-	{
-		readEncoder(&enc1);
-	}
-}
-
-void PIOD_Handler(void)
-{
-	if (PIOD->PIO_ISR & (ENC2B | ENC2I))
-	{
-		readEncoder(&enc2);
 	}
 }
