@@ -553,6 +553,12 @@
     <Compile Include="src\interrupts.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\limitSwitch.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\limitSwitch.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\motorDriver.c">
       <SubType>compile</SubType>
     </Compile>
