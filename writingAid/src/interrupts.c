@@ -8,6 +8,7 @@
 #include "asf.h"
 #include "motorDriver.h"
 #include "encoders.h"
+#include "limitSwitch.h"
 
 void PIOA_Handler(void)
 {
@@ -36,15 +37,31 @@ void PIOA_Handler(void)
 	{
 		readEncoder(&enc2);
 	}
+	//Interrupt of limitswitches
+	if (PIOA->PIO_ISR & LSW11NC){
+		readLimitSwitch(&lsw11);
+	}
+	//Interrupt of limitswitches
+	if (PIOA->PIO_ISR & LSW12NO){
+		readLimitSwitch(&lsw12);
+	}
+	
 }
 
 void PIOB_Handler(void)
 {
 	NVIC_ClearPendingIRQ(PIOB_IRQn);
 	
+	//Interrupt of encoder 1
 	if(PIOB->PIO_ISR & (ENC1A | ENC1B))
 	{
 		readEncoder(&enc1);
+	}
+	
+	//Interrupt of limitswitches
+	if (PIOB->PIO_ISR & LSW11NO)
+	{
+		readLimitSwitch(&lsw11);
 	}
 }
 
@@ -73,8 +90,27 @@ void PIOD_Handler(void)
 {
 	NVIC_ClearPendingIRQ(PIOD_IRQn);
 	
+	//Interrupt of encoder 2
 	if (PIOD->PIO_ISR & (ENC2B | ENC2I))
 	{
 		readEncoder(&enc2);
+	}
+	
+	//Interrupt of limitswitch
+	if (PIOD->PIO_ISR & LSW12NC)
+	{
+		readLimitSwitch(&lsw12);
+	}
+	
+	//Interrupt of limitswitch
+	if (PIOD->PIO_ISR & (LSW21NO | LSW21NC))
+	{
+		readLimitSwitch(&lsw21);
+	}
+	
+	//Interrupt of limitswitch
+	if (PIOD->PIO_ISR & (LSW22NO | LSW22NC))
+	{
+		readLimitSwitch(&lsw22);
 	}
 }
