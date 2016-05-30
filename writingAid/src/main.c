@@ -34,6 +34,9 @@
 #include "serialHandler.h"
 #include "motorDriver.h"
 #include "encoders.h"
+#include "Kinematics.h"
+
+#include <math.h>
 
 //Global data
 encoder enc1;
@@ -69,8 +72,17 @@ int main (void)
 	//Enable all interrupts, last thing to do before starting the main loop
 	cpu_irq_enable();
 	
+	float x = 0;
+	
 	while(1)
 	{
-		serialPutS("Hello world!\r\n");
+		float force = sin(x) * 100.0;
+		writeForcePercentage(1, force);
+		
+		x += 0.01;
+		if (x > 8.0)
+		{
+			x = 0.0;
+		}
 	}
 }
