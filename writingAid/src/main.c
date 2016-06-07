@@ -21,17 +21,27 @@
  *
  */
 
-/*
- * Include header files for all drivers that have been imported from
- * Atmel Software Framework (ASF).
- */
-/*
- * Support and FAQ: visit <a href="http://www.atmel.com/design-support/">Atmel Support</a>
- */
 #include <asf.h>
 #include "conf_board.h"
 #include "conf_clock.h"
 #include "serialHandler.h"
+#include "motorDriver.h"
+#include "encoders.h"
+#include "Kinematics.h"
+#include "limitSwitch.h"
+
+#include <math.h>
+
+//Global data
+encoder enc1;
+encoder enc2;
+
+limitSwitch lsw11;
+limitSwitch lsw12;
+limitSwitch lsw21;
+limitSwitch lsw22;
+
+uint32_t j;
 
 int main (void)
 {
@@ -39,13 +49,60 @@ int main (void)
 	sysclk_init();
 	board_init();
 	
+	//Initialize the serial communication handler for USART0
 	serialInit();
+	
+	//Start the initialization of the motor driverd
+	initMotorDriver();
+	
+	//Set and initialize encoder data
+	enc1.number = 1;
+	enc1.steps = 0;
+	enc1.fullRotations = 0;
+	enc1.cpr = 200;
+	
+	initEncoder(&enc1);
+	
+	enc1.number = 2;
+	enc1.steps = 0;
+	enc1.fullRotations = 0;
+	enc1.cpr = 200;
+	
+	initEncoder(&enc2);
+	
+	initLimitSwitches();
+	
+	lsw11.axis = 1;
+	lsw11.direction = 1;
+	readLimitSwitch(&lsw11);
+	
+	lsw12.axis = 1;
+	lsw12.direction = 1;
+	readLimitSwitch(&lsw12);
+	
+	lsw21.axis = 1;
+	lsw21.direction = 1;
+	readLimitSwitch(&lsw21);
+	
+	lsw22.axis = 1;
+	lsw22.direction = 1;
+	readLimitSwitch(&lsw22);
 	
 	//Enable all interrupts, last thing to do before starting the main loop
 	cpu_irq_enable();
 	
+	float x = 0;
+	
 	while(1)
 	{
-		serialPutS("Hello world!\r\n");
+		float force = sin(x) * 100.0;
+		writeForcePercentage(1, force);
+		
+		x += 0.01;
+		if (x > 8.0)
+		{
+			x = 0.0;
+		}
+		for (j=0; j <= 100000; j++);
 	}
 }
