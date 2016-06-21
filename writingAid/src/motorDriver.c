@@ -98,11 +98,11 @@ extern void enableDrive(uint32_t driver)
 	if (driver == 1)
 	{
 		//Set enable bit of drive 1
-		PIOC->PIO_OER = D1ENBL;
+		PIOC->PIO_SODR = D1ENBL;
 	}else if (driver == 2)
 	{
 		//Set enable bit of drive 2
-		PIOB->PIO_OER = D2ENBL;
+		PIOB->PIO_SODR = D2ENBL;
 	}
 }
 
@@ -111,12 +111,12 @@ extern void disableDrive(uint32_t driver)
 	if (driver == 1)
 	{
 		//Clear enable bit of drive 1
-		PIOC->PIO_ODR = D1ENBL;
+		PIOC->PIO_CODR = D1ENBL;
 	} 
 	else if (driver == 2)
 	{
 		//Clear enable bit of drive 2
-		PIOB->PIO_ODR = D2ENBL;
+		PIOB->PIO_CODR = D2ENBL;
 	}
 }
 
@@ -125,11 +125,11 @@ extern void resetSetDrive(uint32_t driver)
 	if (driver == 1)
 	{
 		//Reset Nreset bit of drive 1
-		PIOC->PIO_ODR = D1NRESET;
+		PIOC->PIO_CODR = D1NRESET;
 	}else if (driver == 2)
 	{
 		//Reset Nreset bit of drive 2
-		PIOC->PIO_ODR = D2NRESET;
+		PIOC->PIO_CODR = D2NRESET;
 	}
 }
 
@@ -138,12 +138,12 @@ extern void resetClearDrive(uint32_t driver)
 	if (driver == 1)
 	{
 		//Set Nreset bit of Drive 1
-		PIOC->PIO_OER = D1ENBL;
+		PIOC->PIO_SODR = D1NRESET;
 	} 
 	else if (driver == 2)
 	{
 		//Set Nreset bit of Drive 2
-		PIOC->PIO_OER = D2ENBL;
+		PIOC->PIO_SODR = D2NRESET;
 	}
 }
 
@@ -152,7 +152,7 @@ extern void writeForcePercentage(uint32_t driver, double percentage)
 	//First calculate the current and get the direction
 	bool phase = (percentage < 0.0); //If percentage is negative then phase is 1
 	
-	double absPercentage = abs(percentage); //Calculate absolute value
+	double absPercentage = fabs(percentage); //Calculate absolute value
 	
 	double currentDouble = absPercentage / 100.0 * 31.0;
 	

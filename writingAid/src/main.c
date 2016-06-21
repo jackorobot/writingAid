@@ -21,6 +21,7 @@
  *
  */
 
+#include <stdio.h>
 #include <asf.h>
 #include "conf_board.h"
 #include "conf_clock.h"
@@ -32,16 +33,14 @@
 
 #include <math.h>
 
+void initPosition(void);
+
 //Global data
 encoder enc1;
 encoder enc2;
 
-limitSwitch lsw11;
-limitSwitch lsw12;
-limitSwitch lsw21;
-limitSwitch lsw22;
-
-uint32_t j;
+limitSwitch lsw1;
+limitSwitch lsw2;
 
 int main (void)
 {
@@ -63,46 +62,113 @@ int main (void)
 	
 	initEncoder(&enc1);
 	
-	enc1.number = 2;
-	enc1.steps = 0;
-	enc1.fullRotations = 0;
-	enc1.cpr = 200;
+	enc2.number = 2;
+	enc2.steps = 0;
+	enc2.fullRotations = 0;
+	enc2.cpr = 200;
 	
 	initEncoder(&enc2);
 	
 	initLimitSwitches();
 	
-	lsw11.axis = 1;
-	lsw11.direction = 1;
-	readLimitSwitch(&lsw11);
+	lsw1.axis = 1;
+	readLimitSwitch(&lsw1);
 	
-	lsw12.axis = 1;
-	lsw12.direction = 1;
-	readLimitSwitch(&lsw12);
-	
-	lsw21.axis = 1;
-	lsw21.direction = 1;
-	readLimitSwitch(&lsw21);
-	
-	lsw22.axis = 1;
-	lsw22.direction = 1;
-	readLimitSwitch(&lsw22);
+	lsw2.axis = 2;
+	readLimitSwitch(&lsw2);
 	
 	//Enable all interrupts, last thing to do before starting the main loop
 	cpu_irq_enable();
 	
-	float x = 0;
+	//Start PIO Clocks
+	PMC->PMC_PCER0 = PMC_PCER0_PID11 | PMC_PCER0_PID12 | PMC_PCER0_PID13 | PMC_PCER0_PID14;
+	
+	//Enable the drives
+	enableDrive(1);
+	enableDrive(2);
+	
+	//Calibrate the rotary encoders
+	//calibrate();
 	
 	while(1)
 	{
-		float force = sin(x) * 100.0;
-		writeForcePercentage(1, force);
+		//////////////////////////////////////////////////////////////////////////
+		// Should not be needed in final product but needed not for motors testing
+		// Fixing the interrupt could be solution?
+		//////////////////////////////////////////////////////////////////////////
 		
-		x += 0.01;
-		if (x > 8.0)
+		//Reset the drives
+		if (PIOA->PIO_PDSR & D1NFAULT)
 		{
-			x = 0.0;
+			resetClearDrive(1);
 		}
-		for (j=0; j <= 100000; j++);
+		else
+		{
+			resetSetDrive(1);
+		}
+		
+		//Reset the drives
+		if (PIOC->PIO_PDSR & D2NFAULT)
+		{
+			resetClearDrive(2);
+		}
+		else
+		{
+			resetSetDrive(2);
+		}
+		
+		//////////////////////////////////////////////////////////////////////////
+		//Testing the motor
+		//////////////////////////////////////////////////////////////////////////
+		writeForcePercentage(1, 10.0);
+		writeForcePercentage(2, 10.0);
+		
+		//////////////////////////////////////////////////////////////////////////
+		// Testing the rotary encoder
+		//////////////////////////////////////////////////////////////////////////
+		char buffer[128];
+		snprintf(buffer, sizeof(buffer), "ENCODER 1: %d steps\n", enc1.steps);
+		serialPutS(buffer);
+		
+		snprintf(buffer, sizeof(buffer), "ENCODER 2: %d steps\n", enc2.steps);
+		serialPutS(buffer);
+		
+		//////////////////////////////////////////////////////////////////////////
+		// Testing the limit switches
+		//////////////////////////////////////////////////////////////////////////
+		snprintf(buffer, sizeof(buffer), "LSW1: %s\n", lsw1.active ? "ACTIVE" : "INACTIVE");
+		serialPutS(buffer);
+		
+		snprintf(buffer, sizeof(buffer), "LSW2: %s\n", lsw2.active ? "ACTIVE" : "INACTIVE");
+		serialPutS(buffer);
+		
+		//ENDLINE
+		snprintf(buffer, sizeof(buffer), "============================================\n");
+		serialPutS(buffer);
+	}
+}
+
+void calibrate(void){
+	//Drive the motor to the limit switch while the limit switch is not active
+	while(!lsw1.active){
+		writeForcePercentage(1, 20.0);
+	}
+	writeForcePercentage(1, 0.0);
+	enc1.fullRotations = 0;
+	enc1.steps = 0;
+	
+	while(enc1.steps != 0){
+		enc1.fullRotations = 0;
+		enc1 .steps = 0;
+	}
+	
+	while(!lsw2.active){
+		writeForcePercentage(2, 20.0);
+	}
+	writeForcePercentage(2, 0.0);
+	
+	while(enc2.steps != 0){
+		enc2.fullRotations = 0;
+		enc2.steps = 0;
 	}
 }

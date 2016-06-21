@@ -9,6 +9,10 @@
 
 void serialInit(void)
 {
+	//Setup PIO to peripheral
+	PIOA->PIO_PDR = PIO_PA10 | PIO_PA11;
+	PIOA->PIO_ABSR &= ~(PIO_PA10 | PIO_PA11);
+	
 	//Start peripheral clock for usart
 	sysclk_enable_peripheral_clock(USART_SERIAL_ID);
 	
@@ -21,7 +25,7 @@ void serialInit(void)
 	};
 	
 	//Initialize usart in rs232 mode
-	usart_init_rs232(USART_SERIAL, &usartConsoleSettings, sysclk_get_main_hz());
+	usart_init_rs232(USART_SERIAL, &usartConsoleSettings, sysclk_get_peripheral_hz());
 	
 	//Enable receiving and sending
 	usart_enable_rx(USART_SERIAL);
@@ -30,6 +34,9 @@ void serialInit(void)
 	//Enable Interrupt when character is received
 	usart_enable_interrupt(USART_SERIAL, US_IER_RXRDY);
 	NVIC_EnableIRQ(USART0_IRQn);
+	
+	//Start serial peripheral clock
+	PMC->PMC_PCER0 = PMC_PCER0_PID8 | PMC_PCER0_PID17;
 }
 
 char serialGet(void)

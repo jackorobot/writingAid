@@ -10,24 +10,24 @@
 extern void initLimitSwitches(void)
 {
 	//Enable PIO pins
-	PIOA->PIO_PER = LSW11NC | LSW12NO;
-	PIOB->PIO_PER = LSW11NO;
-	PIOD->PIO_PER = LSW12NC | LSW21NO | LSW21NC | LSW22NO | LSW22NC;
+	PIOA->PIO_PER = LSW1NC;
+	PIOB->PIO_PER = LSW1NO;
+	PIOD->PIO_PER = LSW2NO | LSW2NC;
 	
 	//Disable output on these pins
-	PIOA->PIO_ODR = LSW11NC | LSW12NO;
-	PIOB->PIO_ODR = LSW11NO;
-	PIOD->PIO_ODR = LSW12NC | LSW21NO | LSW21NC | LSW22NO | LSW22NC;
+	PIOA->PIO_ODR = LSW1NC;
+	PIOB->PIO_ODR = LSW1NO;
+	PIOD->PIO_ODR = LSW2NO | LSW2NC;
 	
 	//Enable interrupts ons these pins
-	PIOA->PIO_IER = LSW11NC | LSW12NO;
-	PIOB->PIO_IER = LSW11NO;
-	PIOD->PIO_IER = LSW12NC | LSW21NO | LSW21NC | LSW22NO | LSW22NC;
+	PIOA->PIO_IER = LSW1NC;
+	PIOB->PIO_IER = LSW1NO;
+	PIOD->PIO_IER = LSW2NO | LSW2NC;
 	
 	//Disable pull ups
-	PIOA->PIO_PUDR = LSW11NC | LSW12NO;
-	PIOB->PIO_PUDR = LSW11NO;
-	PIOD->PIO_PUDR = LSW12NC | LSW21NO | LSW21NC | LSW22NO | LSW22NC;
+	PIOA->PIO_PUDR = LSW1NC;
+	PIOB->PIO_PUDR = LSW1NO;
+	PIOD->PIO_PUDR = LSW2NO | LSW2NC;
 	
 	//Enable encoder interrupts
 	NVIC_EnableIRQ(PIOA_IRQn);
@@ -39,35 +39,15 @@ extern void readLimitSwitch(limitSwitch *lsw)
 {
 	if (lsw->axis == 1)
 	{
-		if (lsw->direction == 1)
-		{
-			lsw->noContact = (PIOB->PIO_PDSR & LSW11NO) ? 1 : 0;
-			lsw->ncContact = (PIOA->PIO_PDSR & LSW11NC) ? 1 : 0;
-			lsw->error = lsw->noContact ^ lsw->ncContact;
+			lsw->noContact = (PIOB->PIO_PDSR & LSW1NO) ? 1 : 0;
+			lsw->ncContact = (PIOA->PIO_PDSR & LSW1NC) ? 1 : 0;
+			lsw->error = lsw->noContact == lsw->ncContact;
 			lsw->active = !lsw->error & lsw->noContact & !lsw->ncContact;
-		}
-		else if (lsw->direction == 2)
-		{
-			lsw->noContact = (PIOA->PIO_PDSR & LSW12NO) ? 1 : 0;
-			lsw->ncContact = (PIOD->PIO_PDSR & LSW12NC) ? 1 : 0;
-			lsw->error = lsw->noContact ^ lsw->ncContact;
-			lsw->active = !lsw->error & lsw->noContact & !lsw->ncContact;			
-		}
 	}else if (lsw->axis == 2)
 	{
-		if (lsw->direction == 1)
-		{
-			lsw->noContact = (PIOD->PIO_PDSR & LSW21NO) ? 1 : 0;
-			lsw->ncContact = (PIOD->PIO_PDSR & LSW21NC) ? 1 : 0;
-			lsw->error = lsw->noContact ^ lsw->ncContact;
-			lsw->active = !lsw->error & lsw->noContact & !lsw->ncContact;
-		} 
-		else if (lsw->direction == 2)
-		{
-			lsw->noContact = (PIOD->PIO_PDSR & LSW22NO) ? 1 : 0;
-			lsw->ncContact = (PIOD->PIO_PDSR & LSW22NC) ? 1 : 0;
-			lsw->error = lsw->noContact ^ lsw->ncContact;
-			lsw->active = !lsw->error & lsw->noContact & !lsw->ncContact;
-		}
+			lsw->noContact = (PIOD->PIO_PDSR & LSW2NO) ? 1 : 0;
+			lsw->ncContact = (PIOD->PIO_PDSR & LSW2NC) ? 1 : 0;
+			lsw->error = lsw->noContact == lsw->ncContact;
+			lsw->active = (lsw->noContact & !lsw->ncContact) | lsw->error;
 	}
 }

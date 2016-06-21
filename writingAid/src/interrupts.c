@@ -38,14 +38,9 @@ void PIOA_Handler(void)
 		readEncoder(&enc2);
 	}
 	//Interrupt of limitswitches
-	if (PIOA->PIO_ISR & LSW11NC){
-		readLimitSwitch(&lsw11);
+	if (PIOA->PIO_ISR & LSW1NC){
+		readLimitSwitch(&lsw1);
 	}
-	//Interrupt of limitswitches
-	if (PIOA->PIO_ISR & LSW12NO){
-		readLimitSwitch(&lsw12);
-	}
-	
 }
 
 void PIOB_Handler(void)
@@ -59,9 +54,9 @@ void PIOB_Handler(void)
 	}
 	
 	//Interrupt of limitswitches
-	if (PIOB->PIO_ISR & LSW11NO)
+	if (PIOB->PIO_ISR & LSW1NO)
 	{
-		readLimitSwitch(&lsw11);
+		readLimitSwitch(&lsw1);
 	}
 }
 
@@ -97,20 +92,8 @@ void PIOD_Handler(void)
 	}
 	
 	//Interrupt of limitswitch
-	if (PIOD->PIO_ISR & LSW12NC)
+	if (PIOD->PIO_ISR & (LSW2NO | LSW2NC))
 	{
-		readLimitSwitch(&lsw12);
-	}
-	
-	//Interrupt of limitswitch
-	if (PIOD->PIO_ISR & (LSW21NO | LSW21NC))
-	{
-		readLimitSwitch(&lsw21);
-	}
-	
-	//Interrupt of limitswitch
-	if (PIOD->PIO_ISR & (LSW22NO | LSW22NC))
-	{
-		readLimitSwitch(&lsw22);
+		readLimitSwitch(&lsw2);
 	}
 }
