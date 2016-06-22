@@ -123,27 +123,34 @@ int main (void)
 		writeForcePercentage(1, 10.0);
 		writeForcePercentage(2, 10.0);
 		
+		char buffer[128];
+		
+		snprintf(buffer, sizeof(buffer), "\e[1;1H\e[?25l");
+		serialPutS(buffer);
+		
+		snprintf(buffer, sizeof(buffer), "============================================\n\r");
+		serialPutS(buffer);
+		
 		//////////////////////////////////////////////////////////////////////////
 		// Testing the rotary encoder
 		//////////////////////////////////////////////////////////////////////////
-		char buffer[128];
-		snprintf(buffer, sizeof(buffer), "ENCODER 1: %d steps\n", enc1.steps);
+		snprintf(buffer, sizeof(buffer), "ENCODER 1: %d steps                \n\r", enc1.steps);
 		serialPutS(buffer);
 		
-		snprintf(buffer, sizeof(buffer), "ENCODER 2: %d steps\n", enc2.steps);
+		snprintf(buffer, sizeof(buffer), "ENCODER 2: %d steps                \n\r", enc2.steps);
 		serialPutS(buffer);
 		
 		//////////////////////////////////////////////////////////////////////////
 		// Testing the limit switches
 		//////////////////////////////////////////////////////////////////////////
-		snprintf(buffer, sizeof(buffer), "LSW1: %s\n", lsw1.active ? "ACTIVE" : "INACTIVE");
+		snprintf(buffer, sizeof(buffer), "LSW1: %s, %s               \n\r", lsw1.active ? "ACTIVE" : "INACTIVE", lsw1.error ? "ERROR" : "NO ERROR");
 		serialPutS(buffer);
 		
-		snprintf(buffer, sizeof(buffer), "LSW2: %s\n", lsw2.active ? "ACTIVE" : "INACTIVE");
+		snprintf(buffer, sizeof(buffer), "LSW2: %s, %s               \n\r", lsw2.active ? "ACTIVE" : "INACTIVE", lsw2.error ? "ERROR" : "NO ERROR");
 		serialPutS(buffer);
 		
 		//ENDLINE
-		snprintf(buffer, sizeof(buffer), "============================================\n");
+		snprintf(buffer, sizeof(buffer), "============================================\n\r");
 		serialPutS(buffer);
 	}
 }
