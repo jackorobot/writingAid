@@ -12,8 +12,6 @@
 
 void PIOA_Handler(void)
 {
-	NVIC_ClearPendingIRQ(PIOA_IRQn);
-	
 	//Interrupt of Drive 2: Nfault
 	if (PIOA->PIO_ISR & D2NFAULT)
 	{
@@ -39,14 +37,15 @@ void PIOA_Handler(void)
 	}
 	//Interrupt of limitswitches
 	if (PIOA->PIO_ISR & LSW1NC){
-		readLimitSwitch(&lsw1);
+		//Start TC0 running
+		TC0->TC_CHANNEL[0]->TC_CCR = TC_CCR_SWTRG;
 	}
+	
+	NVIC_ClearPendingIRQ(PIOA_IRQn);
 }
 
 void PIOB_Handler(void)
 {
-	NVIC_ClearPendingIRQ(PIOB_IRQn);
-	
 	//Interrupt of encoder 1
 	if(PIOB->PIO_ISR & (ENC1A | ENC1B))
 	{
@@ -56,14 +55,15 @@ void PIOB_Handler(void)
 	//Interrupt of limitswitches
 	if (PIOB->PIO_ISR & LSW1NO)
 	{
-		readLimitSwitch(&lsw1);
+		//Start TC0 running
+		TC0->TC_CHANNEL[0]->TC_CCR = TC_CCR_SWTRG;
 	}
+	
+	NVIC_ClearPendingIRQ(PIOB_IRQn);
 }
 
 void PIOC_Handler(void)
 {
-	NVIC_ClearPendingIRQ(PIOC_IRQn);
-	
 	//Interrupt of Drive 1: Nfault
 	if (PIOC->PIO_ISR & D1NFAULT)
 	{
@@ -79,12 +79,12 @@ void PIOC_Handler(void)
 			resetSetDrive(1);
 		}
 	}
+	
+	NVIC_ClearPendingIRQ(PIOC_IRQn);
 }
 
 void PIOD_Handler(void)
-{
-	NVIC_ClearPendingIRQ(PIOD_IRQn);
-	
+{	
 	//Interrupt of encoder 2
 	if (PIOD->PIO_ISR & (ENC2B | ENC2I))
 	{
@@ -94,6 +94,21 @@ void PIOD_Handler(void)
 	//Interrupt of limitswitch
 	if (PIOD->PIO_ISR & (LSW2NO | LSW2NC))
 	{
-		readLimitSwitch(&lsw2);
+		//Start TC1 running
+		TC1->TC_CHANNEL[0]->TC_CCR = TC_CCR_SWTRG;
 	}
+	
+	NVIC_ClearPendingIRQ(PIOD_IRQn);
+}
+
+void TC0_Handler()
+{
+	//Intterrupt of delay timer of limitswitch 1
+	readLimitSwitch(&lsw1);
+}
+
+void TC1_Handler()
+{
+	//Interrupt of delay timer of limitswitch 2
+	readLimitSwitch(&lsw2);
 }

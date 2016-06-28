@@ -81,8 +81,7 @@ int main (void)
 	cpu_irq_enable();
 	
 	//Start PIO Clocks
-	PMC->PMC_PCER0 = PMC_PCER0_PID11 | PMC_PCER0_PID12 | PMC_PCER0_PID13 | PMC_PCER0_PID14;
-	
+	PMC->PMC_PCER0 = PMC_PCER0_PID11 | PMC_PCER0_PID12 | PMC_PCER0_PID13 | PMC_PCER0_PID14 | PMC_PCER0_PID27 | PMC_PCER0_PID28;
 	//Enable the drives
 	enableDrive(1);
 	enableDrive(2);
